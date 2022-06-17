@@ -13,13 +13,13 @@ nltk.download('omw-1.4')
 lemmatizer = WordNetLemmatizer()
 
 model = load_model(
-    "..//intern_project//chatbot//chatbot_model.h5")
+    "..//customercare//chatbot//chatbot_model.h5")
 intents = json.loads(
-    open('..//intern_project//chatbot//intents.json').read())
+    open('..//customercare//chatbot//intents.json').read())
 words = pickle.load(
-    open('..//intern_project//chatbot//words.pkl', 'rb'))
+    open('..//customercare//chatbot//words.pkl', 'rb'))
 classes = pickle.load(
-    open('..//intern_project//chatbot//classes.pkl', 'rb'))
+    open('..//customercare//chatbot//classes.pkl', 'rb'))
 
 
 def clean_up_sentence(sentence):

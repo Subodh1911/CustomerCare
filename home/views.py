@@ -35,7 +35,7 @@ def button(request):
 def external(request):
     inp = request.POST.get('param')
     # out= run([sys.executable,'//mnt//e//work//djnago_testing//test.py',inp],shell=False,stdout=PIPE)
-    out = run([sys.executable, '..//intern_project//chatbot//chatgui.py'],
+    out = run([sys.executable, '..//customercare//chatbot//chatgui.py'],
               shell=False, stdout=PIPE)
     print(out)
 
