@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>
+        Customer Care
+    </title>
+    <style>
+        body {
+            background: #808080;
+            background: -webkit-linear-gradient(to right, #2b3b42, #172f37, #0F2027);
+            background: linear-gradient(to right, #2C5364, #203A43, #0F2027);
+        }
+        h2{
+            color:whitesmoke;
+            margin-left:4%;
+        }
+        input {
+            margin-top: 1.1%;
+            padding: 13px;
+            border-radius: 15px;
+            background-color: #808080;
+            color: white;
+            font-size: 1.1rem;
+        }
+
+        input:hover {
+            cursor: pointer;
+            background-color: rgb(199, 80, 20);
+        }
+    </style>
+</head>
+
+<body>
+
+
+    <h1 style="color:whitesmoke; text-align:center;font-size:50px;">Kfintech Customer care </h1>
+    <hr>
+    <form action="/external/" method="post">
+    {% csrf_token %}
+        <!-- Input Text:
+        <input type="text" name="param" required><br><br>
+        {{data_external}}<br><br> -->
+        <input type="submit" value="Let's talk on chat!" style="margin-left:43%; margin-top:5%;">
+    </form>
+    <div style="margin-left:30%; margin-top:5%;">
+   
+        {% comment %} <em><h2>Hope your query is resolved😊</h2> {% endcomment %}
+        <em><h2>You can also use our Video Call & OCR feature!!😊</h2></em>
+        
+        <div style="display:flex;margin-top:5%;margin-left:6%;">
+        <form action="/sender/" method="post">
+            {% csrf_token %}
+            <input type="submit" value="Video Call">
+        </form>
+        <br><br>
+        <form action="/ocr/" method="post">
+            {% csrf_token %}
+            <input type="submit" value="Ocr scanner" style="margin-left:20%;">
+        </form>
+        <br><br>
+        
+        <form action="/home/" method="post">
+            {% csrf_token %}
+            <input type="submit" value="Return Home" style="margin-left:35%">
+        </form>
+        <br><br>
+
+        </div>
+        <form action="/home/" method="post">
+            {% csrf_token %}
+            <input type="file" value="Upload file" style="margin-left:6%;padding-left:6%">
+        </form>
+    </div>
+</body>
+
+</html>

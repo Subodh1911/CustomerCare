@@ -1,0 +1,241 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Video Call</title>  
+    {% comment %} {% load static %}
+    <link href="{% static 'css/style.css/' %}" rel="stylesheet">  
+    <script src="{% static 'js/sender.js/' %}" type="text/javascript"></script>    {% endcomment %}
+    
+    <style>
+          body {
+    background: #808080;
+    background: -webkit-linear-gradient(to right, #2b3b42, #172f37, #0F2027);
+    background: linear-gradient(to right, #2C5364, #203A43, #0F2027);
+}
+
+button {
+    margin-top: 2%;
+    padding: 10px;
+    border-radius: 15px;
+    background-color: #808080;
+    color: white;
+}
+
+button:hover {
+    cursor: pointer;
+    background-color: rgb(199, 80, 20);
+}
+
+#video-call-div {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    display: none;
+}
+
+#local-video {
+    position: absolute;
+    top: 0;
+    left: 0;
+    margin: 16px;
+    border-radius: 16px;
+    max-width: 30%;
+    max-height: 30%;
+    background: white;
+}
+
+#remote-video {
+    background: #000000;
+    width: 90%;
+    height: 90%;
+    margin-top: 3%;
+    margin-left: 5%;
+    border-radius: 25px;
+}
+
+.call-action-div {
+    position: absolute;
+    left: 35%;
+    bottom: 32px;
+}
+        input[type=submit] {
+            margin-top: 2%;
+            padding: 10px;
+            border-radius: 15px;
+            background-color: #808080;
+            color: white;
+        }
+
+        input[type=submit]:hover {
+            cursor: pointer;
+            background-color: rgb(199, 80, 20);
+        }
+    </style>
+
+</head>
+
+<body>
+    <div style="text-align: center; margin-top:20%;">
+        <input placeholder="Enter your name" type="text" id="username-input"
+            style="padding: 15px; border-radius: 10px;"><br>
+        <button onclick="sendUsername()">Send</button>
+        <button onclick="startCall()">Start Call</button>
+    </div>
+
+    <div id="video-call-div">
+        <video muted id="local-video" autoplay></video>
+        <video id="remote-video" autoplay></video>
+        <div class="call-action-div">
+            <button id="micBtn" onclick="muteAudio()">Mic On</button>
+            <button id="cameraBtn" onclick="muteVideo()">Camera On</button>
+            <div style="display:inline-block;">
+                <form action="/chatbot/" method="post">
+                    {% csrf_token %}
+                     <input type="submit" value="Leave Stream">
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <script>
+    const webSocket = new WebSocket("ws://127.0.0.1:3000")
+
+webSocket.onmessage = (event) => {
+    handleSignallingData(JSON.parse(event.data))
+}
+
+function handleSignallingData(data) {
+    switch (data.type) {
+        case "answer":
+            peerConn.setRemoteDescription(data.answer)
+            break
+        case "candidate":
+            peerConn.addIceCandidate(data.candidate)
+    }
+}
+
+let username
+function sendUsername() {
+
+    username = document.getElementById("username-input").value
+    alert("You are in queue!. ");
+    alert("You can start the call and wait for the execuive to join!");
+    sendData({
+        type: "store_user"
+    })
+}
+
+function sendData(data) {
+    data.username = username
+    webSocket.send(JSON.stringify(data))
+}
+
+
+let localStream
+let peerConn
+function startCall() {
+    document.getElementById("video-call-div")
+        .style.display = "inline"
+
+    navigator.getUserMedia({
+        video: {
+            frameRate: 24,
+            width: {
+                min: 480, ideal: 720, max: 1280
+            },
+            aspectRatio: 1.33333
+        },
+        audio: true
+    }, (stream) => {
+        localStream = stream
+        document.getElementById("local-video").srcObject = localStream
+
+        let configuration = {
+            iceServers: [
+                {
+                    "urls": ["stun:stun.l.google.com:19302",
+                        "stun:stun1.l.google.com:19302",
+                        "stun:stun2.l.google.com:19302"]
+                }
+            ]
+        }
+
+        peerConn = new RTCPeerConnection(configuration)
+        peerConn.addStream(localStream)
+
+        peerConn.onaddstream = (e) => {
+            document.getElementById("remote-video")
+                .srcObject = e.stream
+        }
+
+        peerConn.onicecandidate = ((e) => {
+            if (e.candidate == null)
+                return
+            sendData({
+                type: "store_candidate",
+                candidate: e.candidate
+            })
+        })
+
+        createAndSendOffer()
+    }, (error) => {
+        console.log(error)
+    })
+}
+
+function createAndSendOffer() {
+    peerConn.createOffer((offer) => {
+        sendData({
+            type: "store_offer",
+            offer: offer
+        })
+
+        peerConn.setLocalDescription(offer)
+    }, (error) => {
+        console.log(error)
+    })
+}
+
+let isAudio = true
+function muteAudio() {
+    isAudio = !isAudio
+    localStream.getAudioTracks()[0].enabled = isAudio
+}
+
+let isVideo = true
+function muteVideo() {
+    isVideo = !isVideo
+    localStream.getVideoTracks()[0].enabled = isVideo
+}
+
+micBtn.addEventListener('click', function toggleCamera() {
+    const initialText = 'Mic On';
+
+    if (micBtn.innerText.toLowerCase().includes(initialText.toLowerCase())) {
+        micBtn.innerText = 'Mic Off';
+    } else {
+        micBtn.innerText = initialText;
+    }
+});
+
+cameraBtn.addEventListener('click', function toggleCamera() {
+    const initialText = 'Camera On';
+
+    if (cameraBtn.innerText.toLowerCase().includes(initialText.toLowerCase())) {
+        cameraBtn.innerText = 'Camera Off';
+    } else {
+        cameraBtn.innerText = initialText;
+    }
+});
+
+
+    </script>
+</body>
+
+</html>

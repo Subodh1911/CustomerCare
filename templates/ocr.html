@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>
+        OCR Scanner
+    </title>
+    <style>
+       body {
+            background: #808080;
+            background: -webkit-linear-gradient(to right, #2b3b42, #172f37, #0F2027);
+            background: linear-gradient(to right, #2C5364, #203A43, #0F2027);
+        }
+        .container {
+            height: 500px;
+            position: relative;
+
+        }
+
+        .center {
+            margin: 0;
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            -ms-transform: translate(-50%, -50%);
+            transform: translate(-50%, -50%);
+        }
+
+        input[type=submit] {
+            margin-top: 4%;
+            margin-left: 15%;
+            padding: 15px;
+            border-radius: 15px;
+            background-color: #808080;
+            color: white;
+            font-size: 1.15rem;
+        }
+
+        input[type=submit]:hover {
+            cursor: pointer;
+            background-color: rgb(199, 80, 20);
+        }
+    </style>
+</head>
+
+<body>
+
+
+    <h2 style="color:whitesmoke; text-align:center;font-size:50px;"> Kfintech Customer care </h2>
+    <hr>
+    {% if data %}
+    {{data | safe}}
+    {% endif %}
+
+    <div class="container">
+        <div class="center">
+            <form action="/externalTwo/" method="post">
+                {% csrf_token %}
+                <!-- Input Text:
+                        <input type="text" name="param" required><br><br>
+                        {{data_external}}<br><br> -->
+                <br><br>
+                <div style="margin-bottom:20%;">
+                <label style="color:white;font-size:1.5rem;">Enter your mobile phone's IP address:</label><br><br>
+                <input type="text" name="ip" style="padding:2% 5%;border-radius:6px;width:400px;" required placeholder="Add '/video' after your IP address" ><br>
+                </div>
+                <input type="submit" value="Let's do some scanning!!!">
+        </div>
+    </div>
+
+    </form>
+</body>
+
+</html>
